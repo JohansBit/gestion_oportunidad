@@ -11,13 +11,12 @@ import com.dsy1105.gestion_movil.ui.oportunidad.ListaOportunidadesScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadFormScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadViewModel
 
-// =========================================================================================
-// ARCHIVO DE NAVEGACIÓN PRINCIPAL: AppNavigation
-//
-// 📌 GUÍA Y NOTAS PARA EL COLABORADOR (MÓDULO DE LOGIN/AUTENTICACIÓN):
-// Hola compañero! Actualmente la aplicación inicia directamente en la pantalla "lista"
+
+
+
+
+
 // para probar el flujo de Gestión de Oportunidades.
-//
 // Cuando tengas lista tu pantalla de Login:
 // 1. Cambia 'startDestination = "lista"' por 'startDestination = "login"'.
 // 2. Agrega la ruta de tu pantalla de login aquí dentro:
@@ -31,7 +30,6 @@ import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadViewModel
 //            }
 //        )
 //    }
-// =========================================================================================
 
 @Composable
 fun AppNavigation() {
@@ -45,9 +43,9 @@ fun AppNavigation() {
         startDestination = "lista" // Pantalla de inicio actual
     ) {
 
-        // ---------------------------------------------------------------------------------
-        // RUTA 1: Lista de Oportunidades (ListaOportunidadesScreen)
-        // ---------------------------------------------------------------------------------
+
+        // Lista de Oportunidades (ListaOportunidadesScreen)
+    
         composable("lista") {
             ListaOportunidadesScreen(
                 viewModel = oportunidadViewModel,
@@ -65,9 +63,8 @@ fun AppNavigation() {
             )
         }
 
-        // ---------------------------------------------------------------------------------
-        // RUTA 2: Formulario de Oportunidad (OportunidadFormScreen) - Crear o Editar
-        // ---------------------------------------------------------------------------------
+        // Formulario de Oportunidad (OportunidadFormScreen) Crear o Editar
+   
         composable(
             route = "formulario?oportunidadId={oportunidadId}",
             arguments = listOf(
