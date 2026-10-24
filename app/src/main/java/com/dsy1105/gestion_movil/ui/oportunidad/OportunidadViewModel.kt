@@ -7,8 +7,10 @@ import com.dsy1105.gestion_movil.datos.local.AppDataBase
 import com.dsy1105.gestion_movil.datos.local.OportunidadEntity
 import com.dsy1105.gestion_movil.datos.repository.OportunidadRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -38,7 +40,16 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
 
     // ESTADO DE LA UI (StateFlow - Single Source of Truth)
 
-    // Estado interno mutable (solo modificable dentro del ViewModel)
+    // LISTA DE OPORTUNIDADES ALMACENADAS EN ROOM
+    // Flujo reactivo que emite automáticamente cualquier cambio en la base de datos hacia la UI.
+    val listaOportunidades: StateFlow<List<OportunidadEntity>> = repository.todasLasOportunidades
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    // Estado interno mutable del formulario de registro/edición
     private val _uiState = MutableStateFlow(OportunidadFormState(
         fechaDeteccion = obtenerFechaActual()
     ))
@@ -155,7 +166,7 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
             }
         }
     }
-    // 4. LÓGICA DE NEGOCIO Y PERSISTENCIA Validación y Guardado
+    // LÓGICA DE NEGOCIO Y PERSISTENCIA Validación y Guardado
 
 
      // Valida la presencia de campos obligatorios  y guarda o actualiza
