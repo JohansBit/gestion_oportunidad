@@ -179,7 +179,7 @@ fun ListaOportunidadesScreen(
                 }
             }
 
-            // 3. Contenido principal: Lista de oportunidades o Estado Vacío
+            // Contenido principal: Lista de oportunidades o Estado Vacío
             if (listaFiltrada.isEmpty()) {
                 EstadoVacioOportunidades(
                     hayTextoBusqueda = textoBusqueda.isNotEmpty() || prioridadFiltro != "Todas",
