@@ -38,7 +38,19 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.material:material-icons-extended")
+
+    // CameraX (Lector QR y Cámara - Estructura del profesor)
+    val cameraxVersion = "1.4.2"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+
+    // ML Kit Barcode Scanning (Reconocimiento QR)
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
     val roomVersion = "2.8.4"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
