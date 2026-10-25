@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material3.Card
@@ -72,6 +73,7 @@ import com.dsy1105.gestion_movil.datos.local.OportunidadEntity
 fun ListaOportunidadesScreen(
     viewModel: OportunidadViewModel,
     onNavegarAFormulario: (Long?) -> Unit,
+    onNavegarAEscaner: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // 1. Observación reactiva de la lista de oportunidades desde Room
@@ -110,6 +112,16 @@ fun ListaOportunidadesScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                },
+                actions = {
+                    if (onNavegarAEscaner != null) {
+                        IconButton(onClick = onNavegarAEscaner) {
+                            Icon(
+                                imageVector = Icons.Default.QrCodeScanner,
+                                contentDescription = "Escanear QR de Oportunidad"
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

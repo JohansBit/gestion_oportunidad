@@ -1,6 +1,14 @@
 package com.dsy1105.gestion_movil.ui.navegacion
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -10,13 +18,11 @@ import androidx.navigation.navArgument
 import com.dsy1105.gestion_movil.ui.oportunidad.ListaOportunidadesScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadFormScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadViewModel
+import com.dsy1105.gestion_movil.ui.view.QrScannerScreen
+import com.dsy1105.gestion_movil.ui.viewmodel.QrViewModel
+import com.dsy1105.gestion_movil.utils.CameraPermissionHelper
 
-
-
-
-
-
-// para probar el flujo de Gestión de Oportunidades.
+// ARCHIVO DE NAVEGACIÓN PRINCIPAL: AppNavigation
 // Cuando tengas lista tu pantalla de Login:
 // 1. Cambia 'startDestination = "lista"' por 'startDestination = "login"'.
 // 2. Agrega la ruta de tu pantalla de login aquí dentro:
@@ -25,46 +31,47 @@ import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadViewModel
 //        LoginScreen(
 //            onLoginExitoso = {
 //                navController.navigate("lista") {
-//                    popUpTo("login") { inclusive = true } // Elimina login del historial
+//                    popUpTo("login") { inclusive = true }
 //                }
 //            }
 //        )
 //    }
+// =========================================================================================
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // ViewModel compartido para el módulo de oportunidades
+    // ViewModels compartidos
     val oportunidadViewModel: OportunidadViewModel = viewModel()
+    val qrViewModel: QrViewModel = viewModel()
 
     NavHost(
         navController = navController,
-        startDestination = "lista" // Pantalla de inicio actual
+        startDestination = "lista" // Pantalla inicial actual
     ) {
 
-
-        // Lista de Oportunidades (ListaOportunidadesScreen)
-    
+        // RUTA 1: Lista de Oportunidades
         composable("lista") {
             ListaOportunidadesScreen(
                 viewModel = oportunidadViewModel,
                 onNavegarAFormulario = { oportunidadId ->
                     if (oportunidadId != null && oportunidadId > 0L) {
-                        // Modo Edición: Carga la oportunidad por su ID y navega al formulario
                         oportunidadViewModel.cargarOportunidadPorId(oportunidadId)
                         navController.navigate("formulario?oportunidadId=$oportunidadId")
                     } else {
-                        // Modo Creación: Reinicia el estado del formulario y navega
                         oportunidadViewModel.resetEstadoFormulario()
                         navController.navigate("formulario")
                     }
+                },
+                onNavegarAEscaner = {
+                    navController.navigate("escaner_qr")
                 }
             )
         }
 
-        // Formulario de Oportunidad (OportunidadFormScreen) Crear o Editar
-   
+        // Formulario de Oportunidad (Crear / Editar)
+
         composable(
             route = "formulario?oportunidadId={oportunidadId}",
             arguments = listOf(
@@ -76,7 +83,6 @@ fun AppNavigation() {
         ) { backStackEntry ->
             val idArg = backStackEntry.arguments?.getLong("oportunidadId") ?: -1L
             
-            // Si venimos con un ID válido y no se ha cargado aún, lo cargamos
             if (idArg > 0L) {
                 oportunidadViewModel.cargarOportunidadPorId(idArg)
             }
@@ -84,11 +90,40 @@ fun AppNavigation() {
             OportunidadFormScreen(
                 viewModel = oportunidadViewModel,
                 onGuardadoExitoso = {
-                    // Al guardar exitosamente, regresa a la pantalla de la lista
                     navController.popBackStack()
                 },
                 onNavigateBack = {
-                    // Acción para volver atrás manualmente desde la barra superior
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        //  Escáner de Código QR (Recurso nativo - Cámara)
+
+        composable("escaner_qr") {
+            val context = LocalContext.current
+            var hasCameraPermission by remember {
+                mutableStateOf(CameraPermissionHelper.hasCameraPermission(context))
+            }
+
+            val permissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                hasCameraPermission = isGranted
+            }
+
+            QrScannerScreen(
+                viewModel = qrViewModel,
+                hasCameraPermission = hasCameraPermission,
+                onRequestPermission = {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onQrAplicado = { qrContent ->
+                    // Al escanear un QR exitosamente, se puede asignar como fuente o observaciones
+                    oportunidadViewModel.onFuenteChanged("QR: $qrContent")
                     navController.popBackStack()
                 }
             )
