@@ -16,27 +16,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.dsy1105.gestion_movil.ui.oportunidad.ListaOportunidadesScreen
+import com.dsy1105.gestion_movil.ui.oportunidad.LoginUsuarioScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadFormScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadViewModel
+import com.dsy1105.gestion_movil.ui.oportunidad.RegistroUsuarioScreen
+import com.dsy1105.gestion_movil.ui.oportunidad.UsuarioViewModel
 import com.dsy1105.gestion_movil.ui.view.QrScannerScreen
 import com.dsy1105.gestion_movil.ui.viewmodel.QrViewModel
 import com.dsy1105.gestion_movil.utils.CameraPermissionHelper
-
-// ARCHIVO DE NAVEGACIÓN PRINCIPAL: AppNavigation
-// Cuando tengas lista tu pantalla de Login:
-// 1. Cambia 'startDestination = "lista"' por 'startDestination = "login"'.
-// 2. Agrega la ruta de tu pantalla de login aquí dentro:
-//
-//    composable("login") {
-//        LoginScreen(
-//            onLoginExitoso = {
-//                navController.navigate("lista") {
-//                    popUpTo("login") { inclusive = true }
-//                }
-//            }
-//        )
-//    }
-// =========================================================================================
 
 @Composable
 fun AppNavigation() {
@@ -45,11 +32,43 @@ fun AppNavigation() {
     // ViewModels compartidos
     val oportunidadViewModel: OportunidadViewModel = viewModel()
     val qrViewModel: QrViewModel = viewModel()
+    val usuarioViewModel: UsuarioViewModel = viewModel()
 
     NavHost(
         navController = navController,
-        startDestination = "lista" // Pantalla inicial actual
+        startDestination = "login" // Inicia en el Login
     ) {
+
+        // RUTA 0A: Iniciar Sesión (Login)
+        composable("login") {
+            LoginUsuarioScreen(
+                viewModel = usuarioViewModel,
+                onLoginExitoso = {
+                    navController.navigate("lista") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onIrARegistro = {
+                    navController.navigate("registro")
+                }
+            )
+        }
+
+        // RUTA 0B: Registro de Usuario
+        composable("registro") {
+            RegistroUsuarioScreen(
+                viewModel = usuarioViewModel,
+                onRegistroExitoso = {
+                    // Al registrarse exitosamente, entra directo a la lista
+                    navController.navigate("lista") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onIrALogin = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
         // RUTA 1: Lista de Oportunidades
         composable("lista") {
@@ -70,8 +89,7 @@ fun AppNavigation() {
             )
         }
 
-        // Formulario de Oportunidad (Crear / Editar)
-
+        // RUTA 2: Formulario de Oportunidad (Crear / Editar)
         composable(
             route = "formulario?oportunidadId={oportunidadId}",
             arguments = listOf(
@@ -82,7 +100,7 @@ fun AppNavigation() {
             )
         ) { backStackEntry ->
             val idArg = backStackEntry.arguments?.getLong("oportunidadId") ?: -1L
-            
+
             if (idArg > 0L) {
                 oportunidadViewModel.cargarOportunidadPorId(idArg)
             }
@@ -98,8 +116,7 @@ fun AppNavigation() {
             )
         }
 
-        //  Escáner de Código QR (Recurso nativo - Cámara)
-
+        // RUTA 3: Escáner de Código QR (Recurso nativo - Cámara)
         composable("escaner_qr") {
             val context = LocalContext.current
             var hasCameraPermission by remember {
@@ -122,7 +139,6 @@ fun AppNavigation() {
                     navController.popBackStack()
                 },
                 onQrAplicado = { qrContent ->
-                    // Al escanear un QR exitosamente, se puede asignar como fuente o observaciones
                     oportunidadViewModel.onFuenteChanged("QR: $qrContent")
                     navController.popBackStack()
                 }
