@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.dsy1105.gestion_movil.data.model.QrResult
 import com.dsy1105.gestion_movil.data.repository.QrRepository
 
-// =========================================================================================
+
 // VIEWMODEL: QrViewModel
 // Estructura del profesor para gestionar el estado del resultado del código QR escaneado.
 //
@@ -14,7 +14,7 @@ import com.dsy1105.gestion_movil.data.repository.QrRepository
 // - repository: Instancia de QrRepository.
 // - _qrResult: Estado mutable del resultado QR (LiveData).
 // - qrResult: Estado inmutable de lectura expuesto a la pantalla.
-// =========================================================================================
+
 class QrViewModel : ViewModel() {
 
     private val repository = QrRepository()

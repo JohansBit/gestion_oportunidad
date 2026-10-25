@@ -157,6 +157,19 @@ fun QrScannerScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Botón de apoyo para simular QR en el emulador (evita problemas de texturas 3D)
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onQrDetected("EVENTO-CORPORATIVO-TEST-2026")
+                        isScanning = false
+                        Toast.makeText(context, "¡QR simulado con éxito!", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text("🧪 Simular QR (Prueba en Emulador)")
+                }
             }
             // 3. Resultado del QR detectado
             else if (qrResult != null) {

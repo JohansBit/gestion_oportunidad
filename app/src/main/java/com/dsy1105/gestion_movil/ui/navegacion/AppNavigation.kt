@@ -22,13 +22,7 @@ import com.dsy1105.gestion_movil.ui.view.QrScannerScreen
 import com.dsy1105.gestion_movil.ui.viewmodel.QrViewModel
 import com.dsy1105.gestion_movil.utils.CameraPermissionHelper
 
-// =========================================================================================
 // ARCHIVO DE NAVEGACIÓN PRINCIPAL: AppNavigation
-//
-// 📌 GUÍA Y NOTAS PARA EL COLABORADOR (MÓDULO DE LOGIN/AUTENTICACIÓN):
-// Hola compañero! Actualmente la aplicación inicia directamente en la pantalla "lista"
-// para probar el flujo de Gestión de Oportunidades y el Escáner QR.
-//
 // Cuando tengas lista tu pantalla de Login:
 // 1. Cambia 'startDestination = "lista"' por 'startDestination = "login"'.
 // 2. Agrega la ruta de tu pantalla de login aquí dentro:
@@ -57,9 +51,7 @@ fun AppNavigation() {
         startDestination = "lista" // Pantalla inicial actual
     ) {
 
-        // ---------------------------------------------------------------------------------
         // RUTA 1: Lista de Oportunidades
-        // ---------------------------------------------------------------------------------
         composable("lista") {
             ListaOportunidadesScreen(
                 viewModel = oportunidadViewModel,
@@ -78,9 +70,8 @@ fun AppNavigation() {
             )
         }
 
-        // ---------------------------------------------------------------------------------
-        // RUTA 2: Formulario de Oportunidad (Crear / Editar)
-        // ---------------------------------------------------------------------------------
+        // Formulario de Oportunidad (Crear / Editar)
+
         composable(
             route = "formulario?oportunidadId={oportunidadId}",
             arguments = listOf(
@@ -107,9 +98,8 @@ fun AppNavigation() {
             )
         }
 
-        // ---------------------------------------------------------------------------------
-        // RUTA 3: Escáner de Código QR (Recurso nativo - Cámara)
-        // ---------------------------------------------------------------------------------
+        //  Escáner de Código QR (Recurso nativo - Cámara)
+
         composable("escaner_qr") {
             val context = LocalContext.current
             var hasCameraPermission by remember {

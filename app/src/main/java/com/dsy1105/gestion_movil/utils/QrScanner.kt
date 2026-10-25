@@ -24,13 +24,12 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-// =========================================================================================
+
 // COMPOSABLE: QrScanner
 // Estructura del profesor utilizando CameraX y ML Kit Barcode Scanning.
-//
 // Muestra la vista previa de la cámara y analiza cada fotograma en búsqueda de un código QR.
 // Cuando detecta un QR válido, invoca el callback 'onQrCodeScanned'.
-// =========================================================================================
+
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
