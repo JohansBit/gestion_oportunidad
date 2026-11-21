@@ -46,6 +46,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,6 +114,32 @@ fun OportunidadFormScreen(
         )
     }
 
+    var mostrarEliminar by remember{ mutableStateOf(false)}
+    if(mostrarEliminar){
+        AlertDialog(
+            onDismissRequest = { mostrarEliminar = false },
+            title = { Text("Eliminar Oportunidad") },
+            text = { Text("¿Estás seguro de que deseas eliminar '${state.nombre}'? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarEliminar = false
+                        viewModel.eliminarOportunidad {
+                            onNavigateBack?.invoke()
+                        }
+                    }
+                ) {
+                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarEliminar = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -167,7 +195,12 @@ fun OportunidadFormScreen(
                         label = { Text("Nombre de la Oportunidad *") },
                         isError = state.nombreError != null,
                         supportingText = {
-                            state.nombreError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                            state.nombreError?.let {
+                                Text(
+                                    it,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -186,7 +219,12 @@ fun OportunidadFormScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tipoExpanded) },
                             isError = state.tipoError != null,
                             supportingText = {
-                                state.tipoError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                                state.tipoError?.let {
+                                    Text(
+                                        it,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             },
                             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                             modifier = Modifier
@@ -216,7 +254,12 @@ fun OportunidadFormScreen(
                         label = { Text("Descripción *") },
                         isError = state.descripcionError != null,
                         supportingText = {
-                            state.descripcionError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                            state.descripcionError?.let {
+                                Text(
+                                    it,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
@@ -250,7 +293,12 @@ fun OportunidadFormScreen(
                         placeholder = { Text("Ej: Ejecutivo asignado") },
                         isError = state.responsableInternoError != null,
                         supportingText = {
-                            state.responsableInternoError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                            state.responsableInternoError?.let {
+                                Text(
+                                    it,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -307,14 +355,23 @@ fun OportunidadFormScreen(
                                 onClick = { viewModel.onPrioridadChanged(item) },
                                 label = { Text(item) },
                                 leadingIcon = if (selected) {
-                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                                    {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 } else null
                             )
                         }
                     }
 
                     // Potencial Comercial Estimado (Chips)
-                    Text(text = "Potencial Comercial Estimado", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Potencial Comercial Estimado",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -326,7 +383,13 @@ fun OportunidadFormScreen(
                                 onClick = { viewModel.onPotencialChanged(item) },
                                 label = { Text(item) },
                                 leadingIcon = if (selected) {
-                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                                    {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 } else null
                             )
                         }
@@ -425,6 +488,26 @@ fun OportunidadFormScreen(
                     }
                     Text("Guardar")
                 }
+            }
+            if (state.id > 0L) {
+                TextButton(
+                    onClick = { mostrarEliminar = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isGuardando
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Eliminar oportunidad",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
             }
         }
     }

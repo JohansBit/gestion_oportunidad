@@ -20,4 +20,7 @@ interface OportunidadDao{
 
     @Query("SELECT * FROM oportunidades WHERE id = :id LIMIT 1")
     suspend fun obtenerPorId(id: Long): OportunidadEntity
+
+    @Query("DELETE FROM oportunidades WHERE id = :id")
+    suspend fun eliminar(id : Long)
 }

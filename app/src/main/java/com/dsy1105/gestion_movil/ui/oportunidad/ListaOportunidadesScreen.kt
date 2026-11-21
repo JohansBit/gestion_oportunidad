@@ -56,9 +56,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import com.dsy1105.gestion_movil.datos.local.OportunidadEntity
 
-//  ListaOporpantalla tunidadesScreen
+//  Lista pantalla OportunidadesScreen
 // Módulo de Gestión de Oportunidades
 // Esta pantalla observa en tiempo real las oportunidades registradas en Room a través de
 // 'viewModel.listaOportunidades'.
@@ -74,6 +75,7 @@ fun ListaOportunidadesScreen(
     viewModel: OportunidadViewModel,
     onNavegarAFormulario: (Long?) -> Unit,
     onNavegarAEscaner: (() -> Unit)? = null,
+    onCerrarSesion:(() ->Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // 1. Observación reactiva de la lista de oportunidades desde Room
@@ -120,6 +122,15 @@ fun ListaOportunidadesScreen(
                             Icon(
                                 imageVector = Icons.Default.QrCodeScanner,
                                 contentDescription = "Escanear QR de Oportunidad"
+                            )
+                        }
+                    }
+                    if (onCerrarSesion != null) {
+                        IconButton(onClick = onCerrarSesion) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Cerrar sesión",
+                                tint = MaterialTheme.colorScheme.error
                             )
                         }
                     }
