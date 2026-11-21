@@ -18,4 +18,8 @@ class OportunidadRepository (private val dao: OportunidadDao){
     suspend fun obtenerPorId(id: Long): OportunidadEntity?{
         return dao.obtenerPorId(id)
     }
+
+    suspend fun eliminar(id: Long){
+        dao.eliminar(id)
+    }
 }

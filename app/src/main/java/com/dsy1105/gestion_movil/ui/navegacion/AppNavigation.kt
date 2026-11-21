@@ -85,6 +85,13 @@ fun AppNavigation() {
                 },
                 onNavegarAEscaner = {
                     navController.navigate("escaner_qr")
+                },
+                onCerrarSesion = {
+                    usuarioViewModel.onClaveChange("")
+                    navController.navigate("login") {
+                        popUpTo("lista") { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -101,8 +108,11 @@ fun AppNavigation() {
         ) { backStackEntry ->
             val idArg = backStackEntry.arguments?.getLong("oportunidadId") ?: -1L
 
-            if (idArg > 0L) {
-                oportunidadViewModel.cargarOportunidadPorId(idArg)
+            // LaunchedEffect asegura que solo se cargue al abrir, NUNCA al eliminar/salir
+            androidx.compose.runtime.LaunchedEffect(idArg) {
+                if (idArg > 0L) {
+                    oportunidadViewModel.cargarOportunidadPorId(idArg)
+                }
             }
 
             OportunidadFormScreen(
