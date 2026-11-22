@@ -24,9 +24,22 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
     private val repository: OportunidadRepository
 
     init {
-        // Inicialización de la base de datos de Room y del repositorio
+        // Inicialización de la base de datos de H2 y del repositorio
         val dao = AppDataBase.getDatabase(application).oportunidadDao()
         repository = OportunidadRepository(dao)
+        sincronizarOportunidades()
+    }
+    fun sincronizarOportunidades() {
+        viewModelScope.launch {
+            try {
+                repository.sincronizarConServidor()
+            } catch (e: Exception) {
+                // Si no hay conexión, la UI sigue mostrando lo guardado en Room sin caerse
+                _uiState.update {
+                    it.copy(mensajeError = "Modo sin conexión: ${e.localizedMessage}")
+                }
+            }
+        }
     }
 
 
@@ -254,17 +267,20 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
             try {
                 repository.eliminar(oportunidad)
             } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(mensajeError = "Error al eliminar: ${e.localizedMessage ?: "Desconocido"}") 
-    //Funcion para eliminar una oportunidad
-    fun eliminarOportunidad(onEliminadoExitoso: () -> Unit) {
+                _uiState.update {
+                    it.copy(mensajeError = "Error al eliminar: ${e.localizedMessage ?: "Desconocido"}")
+                }
+            }
+        }
+    }
+    fun eliminarOportunidadActual(onEliminadoExitoso: () -> Unit) {
         val idActual = _uiState.value.id
         if (idActual <= 0L) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isGuardando = true, mensajeError = null) }
             try {
-                repository.eliminar(idActual)
+                repository.eliminarPorId(idActual)
                 resetEstadoFormulario()
                 onEliminadoExitoso()
             } catch (e: Exception) {

@@ -124,7 +124,7 @@ fun OportunidadFormScreen(
                 TextButton(
                     onClick = {
                         mostrarEliminar = false
-                        viewModel.eliminarOportunidad {
+                        viewModel.eliminarOportunidadActual {
                             onNavigateBack?.invoke()
                         }
                     }

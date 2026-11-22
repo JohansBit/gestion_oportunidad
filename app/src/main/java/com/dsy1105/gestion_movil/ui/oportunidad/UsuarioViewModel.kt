@@ -4,6 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.dsy1105.gestion_movil.datos.local.AppDataBase
+import com.dsy1105.gestion_movil.datos.local.SessionManager
+import com.dsy1105.gestion_movil.datos.remote.RetrofitClient
+import com.dsy1105.gestion_movil.datos.remote.UsuarioDto
 import com.dsy1105.gestion_movil.datos.local.UsuarioEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,21 +77,46 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         if (!validarRegistro()) return
         val actual = _estado.value
         viewModelScope.launch {
-            _estado.update { it.copy(cargando = true) }
-            val existe = dao.buscarPorCorreo(actual.correo.trim())
-            if (existe != null) {
-                _estado.update { it.copy(cargando = false, correoError = "El correo ya está registrado") }
-            } else {
-                dao.insertar(
-                    UsuarioEntity(
-                        nombre = actual.nombre.trim(),
-                        correo = actual.correo.trim(),
-                        clave = actual.clave.trim(),
-                        direccion = actual.direccion.trim()
-                    )
+            _estado.update { it.copy(cargando = true, correoError = null) }
+            try {
+                val nuevoUsuario = UsuarioDto(
+                    nombre = actual.nombre.trim(),
+                    correo = actual.correo.trim(),
+                    clave = actual.clave.trim(),
+                    direccion = actual.direccion.trim(),
+                    rol = "EJECUTIVO"
                 )
-                _estado.update { it.copy(cargando = false) }
-                onExito()
+                val response = RetrofitClient.apiService.registrar(nuevoUsuario)
+
+                if (response.isSuccessful && response.body() != null) {
+                    val usuarioCreado = response.body()!!
+                    SessionManager.usuarioActual = usuarioCreado
+                    // Respaldo opcional en Room local
+                    dao.insertar(
+                        UsuarioEntity(
+                            nombre = usuarioCreado.nombre,
+                            correo = usuarioCreado.correo,
+                            clave = actual.clave.trim(),
+                            direccion = usuarioCreado.direccion
+                        )
+                    )
+                    _estado.update { it.copy(cargando = false) }
+                    onExito()
+                } else {
+                    _estado.update {
+                        it.copy(
+                            cargando = false,
+                            correoError = "Error ${response.code()}: verifica datos o ruta"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _estado.update {
+                    it.copy(
+                        cargando = false,
+                        correoError = "Error de conexión con el servidor: ${e.localizedMessage}"
+                    )
+                }
             }
         }
     }
@@ -100,13 +128,33 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
             return
         }
         viewModelScope.launch {
-            _estado.update { it.copy(cargando = true) }
-            val usuario = dao.autenticar(actual.correo.trim(), actual.clave.trim())
-            if (usuario != null) {
-                _estado.update { it.copy(cargando = false, loginError = null) }
-                onExito()
-            } else {
-                _estado.update { it.copy(cargando = false, loginError = "Credenciales incorrectas") }
+            _estado.update { it.copy(cargando = true, loginError = null) }
+            try {
+                val credenciales = mapOf(
+                    "correo" to actual.correo.trim(),
+                    "clave" to actual.clave.trim()
+                )
+                val response = RetrofitClient.apiService.login(credenciales)
+
+                if (response.isSuccessful && response.body() != null) {
+                    SessionManager.usuarioActual = response.body()!!
+                    _estado.update { it.copy(cargando = false, loginError = null) }
+                    onExito()
+                } else {
+                    _estado.update {
+                        it.copy(
+                            cargando = false,
+                            loginError = "Credenciales incorrectas"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _estado.update {
+                    it.copy(
+                        cargando = false,
+                        loginError = "Sin conexión con el servidor (${e.localizedMessage})"
+                    )
+                }
             }
         }
     }

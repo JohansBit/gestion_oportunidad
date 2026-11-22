@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dsy1105.gestion_movil.datos.local.SessionManager
 import com.dsy1105.gestion_movil.ui.oportunidad.ListaOportunidadesScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.LoginUsuarioScreen
 import com.dsy1105.gestion_movil.ui.oportunidad.OportunidadFormScreen
@@ -87,6 +88,7 @@ fun AppNavigation() {
                     navController.navigate("escaner_qr")
                 },
                 onCerrarSesion = {
+                    SessionManager.cerrarSesion()
                     usuarioViewModel.onClaveChange("")
                     navController.navigate("login") {
                         popUpTo("lista") { inclusive = true }
