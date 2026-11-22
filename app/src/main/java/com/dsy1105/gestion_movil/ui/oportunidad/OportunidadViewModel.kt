@@ -256,6 +256,23 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
             } catch (e: Exception) {
                 _uiState.update { 
                     it.copy(mensajeError = "Error al eliminar: ${e.localizedMessage ?: "Desconocido"}") 
+    //Funcion para eliminar una oportunidad
+    fun eliminarOportunidad(onEliminadoExitoso: () -> Unit) {
+        val idActual = _uiState.value.id
+        if (idActual <= 0L) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isGuardando = true, mensajeError = null) }
+            try {
+                repository.eliminar(idActual)
+                resetEstadoFormulario()
+                onEliminadoExitoso()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isGuardando = false,
+                        mensajeError = "Error al eliminar: ${e.localizedMessage}"
+                    )
                 }
             }
         }
