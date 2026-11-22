@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
@@ -225,6 +226,9 @@ fun ListaOportunidadesScreen(
                             oportunidad = oportunidad,
                             onClick = {
                                 onNavegarAFormulario(oportunidad.id) // Navega al modo edición
+                            },
+                            onDelete = {
+                                viewModel.eliminarOportunidad(oportunidad)
                             }
                         )
                     }
@@ -239,7 +243,8 @@ fun ListaOportunidadesScreen(
 @Composable
 private fun OportunidadCardItem(
     oportunidad: OportunidadEntity,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -253,7 +258,7 @@ private fun OportunidadCardItem(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Encabezado Nombre y Chip de Prioridad
+            // Encabezado Nombre, Chip de Prioridad y Botón Eliminar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -268,6 +273,18 @@ private fun OportunidadCardItem(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 ChipPrioridad(prioridad = oportunidad.prioridad)
+                Spacer(modifier = Modifier.width(4.dp))
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar oportunidad",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))

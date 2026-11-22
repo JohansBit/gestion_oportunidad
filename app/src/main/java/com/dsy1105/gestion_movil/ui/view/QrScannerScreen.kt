@@ -123,10 +123,10 @@ fun QrScannerScreen(
                 ) {
                     QrScanner(
                         onQrCodeScanned = { qrContent ->
-                            // Procesar el QR detectado a través del ViewModel
+                            // Procesar el QR detectado a través del ViewModel y guardar en BD
                             viewModel.onQrDetected(qrContent)
                             isScanning = false
-                            Toast.makeText(context, "¡Código QR detectado!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "¡QR detectado y guardado en la BD!", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -165,7 +165,7 @@ fun QrScannerScreen(
                     onClick = {
                         viewModel.onQrDetected("EVENTO-CORPORATIVO-TEST-2026")
                         isScanning = false
-                        Toast.makeText(context, "¡QR simulado con éxito!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "¡QR simulado y guardado en la BD!", Toast.LENGTH_SHORT).show()
                     }
                 ) {
                     Text("🧪 Simular QR (Prueba en Emulador)")
