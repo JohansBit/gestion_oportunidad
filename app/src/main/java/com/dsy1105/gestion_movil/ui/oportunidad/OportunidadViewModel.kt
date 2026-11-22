@@ -17,15 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * OportunidadViewModel
- *
- * Clase ViewModel encargada de gestionar la lógica de negocio y el estado de la UI 
- * para el módulo de Oportunidades, siguiendo el patrón de arquitectura MVVM.
- *
- * Hereda de AndroidViewModel para acceder al contexto de la aplicación e inicializar
- * la base de datos local de Room.
- */
+
 class OportunidadViewModel(application: Application) : AndroidViewModel(application) {
 
     // Instancia del repositorio que centraliza las operaciones de datos (Room)
@@ -252,5 +244,20 @@ class OportunidadViewModel(application: Application) : AndroidViewModel(applicat
      */
     fun consumirMensajeError() {
         _uiState.update { it.copy(mensajeError = null) }
+    }
+
+    /**
+     * Elimina una oportunidad de la base de datos de Room.
+     */
+    fun eliminarOportunidad(oportunidad: OportunidadEntity) {
+        viewModelScope.launch {
+            try {
+                repository.eliminar(oportunidad)
+            } catch (e: Exception) {
+                _uiState.update { 
+                    it.copy(mensajeError = "Error al eliminar: ${e.localizedMessage ?: "Desconocido"}") 
+                }
+            }
+        }
     }
 }
